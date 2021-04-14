@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: kafka-retry-<%= env %>
+  labels:
+    app: kafka-retry-<%= env %>
+    env: <%= env %>
+spec:
+  ports:
+    - name: web
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: kafka-retry-<%= env %>
+    env: <%= env %>
+  type: ClusterIP

@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-retry-<%= env %>
+  labels:
+    app: kafka-retry-<%= env %>
+    project: microservice
+    env: <%= env %>
+spec:
+  replicas: 2
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: kafka-retry-<%= env %>
+      env: <%= env %>
+  template:
+    metadata:
+      labels:
+        app: kafka-retry-<%= env %>
+        env: <%= env %>
+        hash: <%= current_sha %>
+    spec:
+      volumes:
+        - name: config
+          secret:
+            secretName: kafka-retry-config-<%= env %>
+      containers:
+        - image: <%= image %>
+          name: kafka-retry
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          volumeMounts:
+            - name: config
+              readOnly: true
+              mountPath: /app/config/
+          env:
+            - name: CONFIG_PATH
+              value: "/app/config/"
+            - name: HTTP_PORT
+              value: "8080"
+          ports:
+            - containerPort: 8080
+              name: web

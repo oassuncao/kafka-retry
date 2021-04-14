@@ -1,0 +1,32 @@
+kafka:
+  bootstrap-servers: localhost
+
+retry:
+  topic: retry
+  group: retry
+  concurrency: 2
+  dlq: dlq
+
+  metric:
+    name: retry_retry_latency
+    description: Computed elapsed time based on RECEIVED_TIMESTAMP message header
+
+  attempts:
+    - topic: retry-1
+      delay: 15s
+      concurrency: 1
+    - topic: retry-2
+      delay: 15s
+      concurrency: 1
+    - topic: retry-3
+      delay: 15s
+      concurrency: 1
+    - topic: retry-4
+      delay: 15s
+      concurrency: 1
+    - topic: retry-5
+      delay: 15s
+      concurrency: 1
+
+log:
+  level: info
